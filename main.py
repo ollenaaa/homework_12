@@ -172,7 +172,7 @@ def input_error(func):
 
 class AddressBookManager():
     def __init__(self):
-        self.address_book = AddressBook()
+        self.address_book = self.read_book_from_file()
 
     @input_error
     def hello_user(self):
@@ -180,6 +180,7 @@ class AddressBookManager():
 
     @input_error
     def goodbye_user(self):
+        self.save_book_to_file()
         return "Good bye!"
 
     @input_error
@@ -251,16 +252,15 @@ class AddressBookManager():
         else:
             raise ValueError
 
-    def save_book_to_file(self, filename):
-        with open(f"{filename}.bin", 'wb') as fd:
+    def save_book_to_file(self):
+        with open("book.bin", 'wb') as fd:
             pickle.dump(self.address_book, fd)
-            return f"Address Book has been saved to {filename}.bin"
+            return f"Address Book has been saved to book.bin"
 
-    def read_book_from_file(self, filename):
-        with open(f"{filename}.bin", 'rb') as fd:
+    def read_book_from_file(self):
+        with open("book.bin", 'rb') as fd:
             unpacked = pickle.load(fd)
-            self.address_book = unpacked
-            return f"Address Book has been read from {filename}.bin"
+            return unpacked
 
     def search_contact(self, string):
         result = 'Matching with'
@@ -286,8 +286,6 @@ OPERATIONS = {
     'birthday': manager.birthday_of_contact,
     'show all': manager.show_all_contacts,
     'search': manager.search_contact,
-    'save': manager.save_book_to_file,
-    'read': manager.read_book_from_file,
     'good bye': manager.goodbye_user,
     'close': manager.goodbye_user,
     'exit': manager.goodbye_user,
@@ -311,6 +309,17 @@ def parse_command(input_string):
 
 
 def main():
+    print('Commands:'
+          '\n\thello - greet the contact'
+          '\n\tadd contact {name} {birthday} - add a new contact (birthday is optional)'
+          '\n\tadd {name} {phone} - add a phone number to an existing contact'
+          '\n\tchange {name} {phone} {new_phone} - change a phone number for a contact'
+          '\n\tremove {name} {phone} - remove a phone number from a contact'
+          '\n\tphones {name} - show all phone numbers belonging to a contact'
+          "\n\tbirthday {name} - show how many days are left until the contact's birthday"
+          '\n\tshow all - display all contacts'
+          '\n\tsearch {string} - search for contacts by name or phone number'
+          '\n\tgood bye, close, exit - exit the program')
     while True:
         command = input("Enter a command: ").lower().strip()
         operator, args = parse_command(command)
